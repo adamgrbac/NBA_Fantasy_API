@@ -1,27 +1,29 @@
 import requests
+import pandas as pd
+import numpy as np
 import Authenticator
 import xml.etree.ElementTree as ET
 from player import Player
-from NBAStats import NBAStats
 from typing import List
 
 
 # REFACTOR:
 #   Make this an abstract class to account for other fantasy services
 class FantasyAPI:
-    def __init__(self, league_id: int, authenticator: Authenticator, stats: NBAStats):
+    def __init__(self, league_id: int, season: int, authenticator: Authenticator):
         self.league_id = league_id
-        self.access_token = authenticator.get_access_token()
+        self.access_token = authenticator.access_token
         self.PREFIX = "default:"
         self.XMLNS = {"default": "http://fantasysports.yahooapis.com/fantasy/v2/base.rng"}
-        self.stats = stats
+        self.season = season
+        self.players = self.get_players()
 
     def get_game_key(self) -> str:
-        res = requests.get("https://fantasysports.yahooapis.com/fantasy/v2/game/nba",
+        res = requests.get(f"https://fantasysports.yahooapis.com/fantasy/v2/games;game_codes=nba;seasons={self.season}",
                            headers={"Authorization": f"Bearer {self.access_token}"})
         root = ET.fromstring(res.content.decode('utf8'))
 
-        return root.find(f"{self.PREFIX}game", self.XMLNS).find(f"{self.PREFIX}game_key", self.XMLNS).text
+        return root.find(f"{self.PREFIX}games", self.XMLNS).find(f"{self.PREFIX}game", self.XMLNS).find(f"{self.PREFIX}game_key", self.XMLNS).text
 
     def get_players(self) -> List[Player]:
         empty = False
@@ -46,7 +48,6 @@ class FantasyAPI:
                         player_dict[k] = v
                     for k, v in ownership_dict.items():
                         player_dict[k] = v
-                    nba_player_id = self.stats.get_player_id(player_dict["player_key"])
                     players.append(Player(player_dict["player_key"],
                                           player_dict["first"],
                                           player_dict["last"],
@@ -57,9 +58,7 @@ class FantasyAPI:
                                           player_dict.get("status", ""),
                                           player_dict["ownership_type"],
                                           player_dict.get("owner_team_key", ""),
-                                          player_dict.get("owner_team_name", ""),
-                                          nba_player_id,
-                                          self.stats.get_gamelogs(nba_player_id)))
+                                          player_dict.get("owner_team_name", "")))
 
                 start += len(xml_players)
 

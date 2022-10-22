@@ -16,6 +16,9 @@ class Authenticator:
         self.access_token_url = access_token_url
         self.redirect_uri = redirect_uri
         self.refresh_token = refresh_token
+        self.access_token = None
+        
+        self.get_access_token()
 
     def get_access_token(self) -> str:
 
@@ -43,4 +46,4 @@ class Authenticator:
 
         # Save access & refresh tokens
         self.refresh_token = res.json()['refresh_token']
-        return res.json()['access_token']
+        self.access_token = res.json()['access_token']
