@@ -12,7 +12,7 @@ app.layout = html.Div(
             dbc.Nav([
                 dbc.NavLink(
                     f"{page['name']}", href=page["relative_path"]
-                ) for i, page in enumerate(dash.page_registry.values())
+                ) for i, page in enumerate(dash.page_registry.values()) if page["name"] != "Players"
             ]) 
         ]),
         html.Div([
@@ -22,4 +22,4 @@ app.layout = html.Div(
 )
 
 if __name__ == "__main__":
-    app.run_server(debug=True)
+    app.run_server(host="0.0.0.0", debug=True)
