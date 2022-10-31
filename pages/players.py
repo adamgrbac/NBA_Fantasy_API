@@ -146,6 +146,8 @@ def layout():
     Input("fantasy_team_dropdown","value")]
 )
 def update_data(team_name, player_name, fantasy_team_name):
+
+    print(team_name, player_name, fantasy_team_name)
                        
     if team_name == "" or team_name is None:
         D_TEAM_filtered = D_TEAM
@@ -157,7 +159,7 @@ def update_data(team_name, player_name, fantasy_team_name):
     else:
         D_PLAYER_filtered = D_PLAYER.loc[D_PLAYER.apply(lambda row: f"{row.player_first_name} {row.player_last_name}",axis=1) == player_name, :]
 
-    if fantasy_team_name == "" or player_name is None:
+    if fantasy_team_name == "" or fantasy_team_name is None:
         D_PLAYER_filtered = D_PLAYER_filtered
     elif fantasy_team_name in ("freeagents", "waivers"):
         D_PLAYER_filtered = D_PLAYER_filtered.loc[D_PLAYER_filtered.ownership_type == fantasy_team_name, :]
