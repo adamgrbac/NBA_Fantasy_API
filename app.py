@@ -12,7 +12,7 @@ app.layout = html.Div(
             dbc.Nav([
                 dbc.NavLink(
                     f"{page['name']}", href=page["relative_path"]
-                ) for i, page in enumerate(dash.page_registry.values()) if page["name"] != "Players"
+                ) for i, page in enumerate(dash.page_registry.values())# if page["name"] != "Players"
             ]) 
         ]),
         html.Div([

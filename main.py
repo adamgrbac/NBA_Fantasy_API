@@ -52,7 +52,7 @@ def main():
      
     # Get NBA Stats
     print("Setting up stats...")
-    stats = NBAStats(id_lookup, "2021-22")
+    stats = NBAStats(id_lookup, "2022-23")
     
     # Set NBA Player IDs based on lookup
     for player in yahoo_fantasy.players:
@@ -68,7 +68,7 @@ def main():
     stats.gamelogs[["TEAM_ID", "TEAM_ABBREVIATION", "TEAM_NAME"]].drop_duplicates().to_csv("./data/nba/D_TEAM.csv", index=False)    
 
     # D_GAME
-    stats.gamelogs[["GAME_ID", "GAME_DATE", "MATCHUP"]].drop_duplicates().to_csv("./data/nba/D_GAME.csv", index=False) 
+    stats.gamelogs[["GAME_ID", "GAME_DATE"]].drop_duplicates().to_csv("./data/nba/D_GAME.csv", index=False) 
     
     # F_GAMELOGS
     F_GAMELOGS_COLS = [col for col in list(stats.gamelogs.columns) if col not in ["TEAM_ABBREVIATION", "TEAM_NAME", "PLAYER_NAME", "NICKNAME", "GAME_DATE", "MATCHUP", "DD2", "TD3", "WNBA_FANTASY_PTS", "VIDEO_AVAILABLE_FLAG"]]
