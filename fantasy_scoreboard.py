@@ -1,4 +1,5 @@
-from rauth import OAuth2Service, OAuth2Session
+from Authenticator import Authenticator
+from FantasyAPI import FantasyAPI
 
 import xml.etree.ElementTree as ET
 import pandas as pd
@@ -13,6 +14,7 @@ import time
 client_id = os.getenv("YAHOO_CLIENT_ID")
 client_secret = os.getenv("YAHOO_CLIENT_SECRET")
 league_id = '81070'
+season_year = 2022
 prefix = "default:"
 xmlns = {"default":"http://fantasysports.yahooapis.com/fantasy/v2/base.rng"}
 stat_map = {9004003: "fgma",
@@ -27,62 +29,35 @@ stat_map = {9004003: "fgma",
             18: "blk",
             19: "to"}
 
-# Create OAuth Service for yahoo paramaters
-yahoo = OAuth2Service(
-	client_id = client_id,
-	client_secret= client_secret,
-	name="Rim Rattlers Stats",
-	authorize_url="https://api.login.yahoo.com/oauth2/request_auth",
-	access_token_url="https://api.login.yahoo.com/oauth2/get_token",
-	base_url="https://api.login.yahoo.com/")
-
-redirect_uri = "https://example.com/callback"
-params = {'response_type':'code',
-		'redirect_uri':redirect_uri}
-
 # Get refresh token if exists
 try:
     with open("REFRESH_TOKEN", encoding="utf-8") as f:
         REFRESH_TOKEN = f.readline()
 except Exception:
     REFRESH_TOKEN = None
- 
-# Authenticate using Refresh Token if possible, otherwise prompt user to approve in browser 
-if REFRESH_TOKEN:
-    print("Using refresh token to authorise access...")
-    at_object = yahoo.get_raw_access_token(data={'refresh_token':REFRESH_TOKEN,'grant_type':'refresh_token','redirect_uri':redirect_uri})
-else:
-    print("Refresh token not found! Authorise access at the following URL and input the returned code:\n")
-    authorize_url = yahoo.get_authorize_url(**params)
-    print(authorize_url)
-    code = input("\nInput access code: ")
-    at_object = yahoo.get_raw_access_token(data={'code':code,'grant_type':'authorization_code','redirect_uri':redirect_uri})
-
-# Save access & refresh tokens
-ACCESS_TOKEN = at_object.json()['access_token']
-REFRESH_TOKEN = at_object.json()['refresh_token']
+    
+# Create OAuth Service for yahoo paramaters
+authenticator = Authenticator(client_id=os.getenv('YAHOO_CLIENT_ID'),
+                              client_secret=os.getenv('YAHOO_CLIENT_SECRET'),
+                              refresh_token=REFRESH_TOKEN,
+                              auth_url="https://api.login.yahoo.com/oauth2/request_auth",
+                              access_token_url="https://api.login.yahoo.com/oauth2/get_token")
 
 # Write the latest refresh token
-with open("refresh.token", "w", encoding="utf-8") as f:
+with open("REFRESH_TOKEN", "w", encoding="utf-8") as f:
     f.write(REFRESH_TOKEN)
 
-# Start authenticated session
-sess = OAuth2Session(client_id,client_secret,ACCESS_TOKEN)
+print("Setting up Fantasy API...")
+yahoo_fantasy = FantasyAPI(league_id, season_year, authenticator)
 
 # Get game ID
-res = sess.get("https://fantasysports.yahooapis.com/fantasy/v2/game/nba")
-root = ET.fromstring(res._content.decode('utf8'))
-game_key = root.find(prefix+"game", xmlns).find(prefix+"game_key", xmlns).text
+game_key = yahoo_fantasy.get_game_key()
 
 # Get current week
-res = sess.get(f'https://fantasysports.yahooapis.com/fantasy/v2/league/{game_key}.l.{league_id}')
-root = ET.fromstring(res._content.decode('utf8'))
-current_week = int(root.find(prefix+"league", xmlns).find(prefix+"current_week", xmlns).text) - 1
+current_week = yahoo_fantasy.get_current_week(game_key)
 
 # Parse XML to get scoreboard
-res = sess.get(f'https://fantasysports.yahooapis.com/fantasy/v2/league/{game_key}.l.{league_id}/scoreboard?week={str(current_week)}')
-root = ET.fromstring(res._content.decode('utf8'))
-scoreboard = root.find(prefix+'league', xmlns).find(prefix+'scoreboard', xmlns)
+scoreboard = yahoo_fantasy.get_scoreboard(game_key, current_week)
 
 # Get Matchups from scoreboard
 matchups = scoreboard.find(prefix+"matchups", xmlns)

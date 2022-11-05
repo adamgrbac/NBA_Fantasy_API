@@ -24,6 +24,20 @@ class FantasyAPI:
         root = ET.fromstring(res.content.decode('utf8'))
 
         return root.find(f"{self.PREFIX}games", self.XMLNS).find(f"{self.PREFIX}game", self.XMLNS).find(f"{self.PREFIX}game_key", self.XMLNS).text
+        
+    def get_current_week(self, game_key: str) -> int:
+        res = requests.get(f'https://fantasysports.yahooapis.com/fantasy/v2/league/{game_key}.l.{self.league_id}',
+                           headers={"Authorization": f"Bearer {self.access_token}"})
+        root = ET.fromstring(res.content.decode('utf8'))
+
+        return int(root.find(f"{self.PREFIX}league", self.XMLNS).find(f"{self.PREFIX}current_week", self.XMLNS).text) - 1
+        
+    def get_scoreboard(self, game_key, week: int) -> str:
+        res = requests.get(f'https://fantasysports.yahooapis.com/fantasy/v2/league/{game_key}.l.{self.league_id}/scoreboard?week={str(week)}',
+                           headers={"Authorization": f"Bearer {self.access_token}"})
+        root = ET.fromstring(res.content.decode('utf8'))
+
+        return root.find(f"{self.PREFIX}league", self.XMLNS).find(f"{self.PREFIX}scoreboard", self.XMLNS)
 
     def get_players(self) -> List[Player]:
         empty = False
