@@ -37,7 +37,7 @@ DISPLAY_COLUMNS = [
     "owner_name",
     "ownership_type"
 ]
-
+    
 F_GAMELOGS = pd.read_csv("./data/nba/F_GAMELOGS.csv")
 D_PLAYER = pd.read_csv("./data/nba/D_PLAYER.csv")
 D_GAME = pd.read_csv("./data/nba/D_GAME.csv")
@@ -47,12 +47,17 @@ DENORM = (F_GAMELOGS.merge(D_PLAYER, on="PLAYER_ID", how="inner", suffixes=["","
                     .merge(D_GAME, on="GAME_ID", how="inner", suffixes=["","_d"])
                     .merge(D_TEAM, on="TEAM_ID", how="inner", suffixes=["","_d"]))
                     
-DENORM = DENORM[DISPLAY_COLUMNS]
+DENORM = DENORM[DISPLAY_COLUMNS]   
     
 dash.register_page(__name__)
 
 def layout():
-
+    global F_GAMELOGS
+    global D_PLAYER
+    global D_GAME
+    global D_TEAM
+    global DENORM
+    
     F_GAMELOGS = pd.read_csv("./data/nba/F_GAMELOGS.csv")
     D_PLAYER = pd.read_csv("./data/nba/D_PLAYER.csv")
     D_GAME = pd.read_csv("./data/nba/D_GAME.csv")
@@ -146,8 +151,6 @@ def layout():
     Input("fantasy_team_dropdown","value")]
 )
 def update_data(team_name, player_name, fantasy_team_name):
-
-    print(team_name, player_name, fantasy_team_name)
                        
     if team_name == "" or team_name is None:
         D_TEAM_filtered = D_TEAM
