@@ -225,10 +225,18 @@ with open("./data/fantasy/week_"+str(current_week)+"/2_Cat_Winners.csv","w") as 
                     val = -team[key]
                     cat_winners[key]["team"] = team["name"].encode('ascii','ignore').decode('ascii')
                     cat_winners[key]["val"] = -val
+                elif -team[key] == val:
+                    val = -team[key]
+                    cat_winners[key]["team"] += " | "+team["name"].encode('ascii','ignore').decode('ascii')
+                    cat_winners[key]["val"] = -val
             else:
                 if team[key] > val:
                     val = team[key]
                     cat_winners[key]["team"] = team["name"].encode('ascii','ignore').decode('ascii')
+                    cat_winners[key]["val"] = val
+                elif team[key] == val:
+                    val = team[key]
+                    cat_winners[key]["team"] += " | "+team["name"].encode('ascii','ignore').decode('ascii')
                     cat_winners[key]["val"] = val
         f.write(key+","+cat_winners[key]["team"].encode('ascii','ignore').decode('ascii')+","+str(cat_winners[key]["val"])+"\n")
 
