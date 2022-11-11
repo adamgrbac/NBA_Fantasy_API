@@ -292,6 +292,7 @@ def layout():
                         PLAYER_AGG.to_dict('records'),
                         columns=datatable_column_def(DISPLAY_AGG_COLUMNS),
                         id='player_tbl',
+                        sort_action="native",
                         style_cell={
                             "font-size": 10
                         },
@@ -304,6 +305,7 @@ def layout():
                         DENORM.to_dict('records'),
                         columns=datatable_column_def(DISPLAY_COLUMNS),
                         id='tbl',
+                        sort_action="native",
                         style_cell={
                             "font-size": 10
                         },
