@@ -2,9 +2,72 @@ import dash
 from dash import Dash, dash_table, dcc, html, Input, Output, callback
 import pandas as pd
 import numpy as np
+from math import floor
 from pathlib import Path
 
 dash.register_page(__name__)
+
+def colour_scale(start, mid, end, steps=64):
+    colours = ['rgb'+str(start)]
+    
+    red_diff = mid[0] - start[0]
+    green_diff = mid[1] - start[1]
+    blue_diff = mid[2] - start[2]
+    
+    for i in range(1, steps//2):
+        colours.append('rgb'+str((floor(start[0]+i*(red_diff*2/steps)),
+                        floor(start[1]+i*(green_diff*2/steps)),
+                        floor(start[2]+i*(blue_diff*2/steps)))))
+                        
+    red_diff = end[0] - mid[0]
+    green_diff = end[1] - mid[1]
+    blue_diff = end[2] - mid[2]
+    
+    for i in range(1, steps//2):
+        colours.append('rgb'+str((floor(mid[0]+i*(red_diff*2/steps)),
+                        floor(mid[1]+i*(green_diff*2/steps)),
+                        floor(mid[2]+i*(blue_diff*2/steps)))))
+                        
+    colours.append('rgb'+str(end))
+    
+    return colours
+    
+colour_scale = colour_scale((250, 128, 114),
+                            (240, 230, 140),
+                            (127, 255, 212))
+
+def heatmap_column(df, col, rev=False, n_bins=64):
+    bounds = [i * (1.0 / n_bins) for i in range(n_bins + 1)]
+    col_max = df[col].max()
+    col_min = df[col].min()
+    ranges = [
+        ((col_max - col_min) * i) + col_min
+        for i in bounds
+    ]
+    styles = []
+    legend = []
+    for i in range(1, len(bounds)):
+        min_bound = ranges[i - 1]
+        max_bound = ranges[i]
+        if rev:
+            backgroundColor = colour_scale[len(bounds)- i - 1]
+        else:
+            backgroundColor = colour_scale[i - 1]
+        color = 'white' if i > len(bounds) / 2. else 'inherit'
+
+        styles.append({
+            'if': {
+                'filter_query': (
+                    '{{{column}}} >= {min_bound}' +
+                    (' && {{{column}}} < {max_bound}' if (i < len(bounds) - 1) else '')
+                ).format(column=col, min_bound=min_bound, max_bound=max_bound),
+                'column_id': col
+            },
+            'backgroundColor': backgroundColor,
+            'color': color
+        })
+    return styles
+    
 
 def layout():
 
@@ -17,6 +80,13 @@ def layout():
     what_if_cats = pd.read_csv(f"./data/fantasy/week_{max_week}/3_WhatIf_Cats.csv")
     what_if_wl = pd.read_csv(f"./data/fantasy/week_{max_week}/4_WhatIf_WL.csv")
     mvp = pd.read_csv(f"./data/fantasy/week_{max_week}/MVP.csv")
+    
+    col_styles = []
+    for col in ["fgp", "ftp", "tpm", "pts", "reb", "ast", "st", "blk", "to", "gp"]:
+        if col == "to":
+            col_styles.extend(heatmap_column(results,col, True))
+        else:
+            col_styles.extend(heatmap_column(results,col))
 
     return html.Div(
         children=[
@@ -43,8 +113,8 @@ def layout():
                     id='tbl_results',
                     style_cell={
                         "textAlign": "center"
-                    }           
-
+                    },
+                    style_data_conditional=col_styles
                 ),
             ],
             style={
