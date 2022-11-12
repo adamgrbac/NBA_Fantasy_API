@@ -239,7 +239,8 @@ def layout():
     Output("tbl_what_if_wl", "columns"),
     Output("tbl_mvp", "data"),
     Output("tbl_mvp", "columns"),
-    Output("tbl_what_if_wl", "style_data_conditional")],
+    Output("tbl_what_if_wl", "style_data_conditional"),
+    Output("tbl_results", "style_data_conditional")],
     [Input("week_dropdown", "value")]
 )
 def load_stats_week(week_num: str):
@@ -276,6 +277,13 @@ def load_stats_week(week_num: str):
         } for col in what_if_wl.columns if col not in ["team","score"]]
     )
     
+    col_styles = []
+    for col in ["fgp", "ftp", "tpm", "pts", "reb", "ast", "st", "blk", "to", "gp"]:
+        if col == "to":
+            col_styles.extend(heatmap_column(results,col, True))
+        else:
+            col_styles.extend(heatmap_column(results,col))
+    
     return (results.to_dict("records"),
             [{"name": i, "id": i} for i in results.columns],
             cat_winners.to_dict("records"),
@@ -286,5 +294,6 @@ def load_stats_week(week_num: str):
             [{"name": i, "id": i} for i in what_if_wl.columns],
             mvp.to_dict("records"),
             [{"name": i, "id": i} for i in mvp.columns],
-            WIWL_style_cond)
+            WIWL_style_cond,
+            col_styles)
             
