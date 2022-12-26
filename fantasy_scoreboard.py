@@ -311,7 +311,7 @@ def agg_season_data(data_list: List) -> Dict:
             
     for k in season_data:
         season_data[k]["fgp"] = round(int(season_data[k]["fgma"].split("/")[0]) / int(season_data[k]["fgma"].split("/")[1]),3)
-        season_data[k]["ftp"] = round(int(season_data[k]["fgma"].split("/")[0]) / int(season_data[k]["fgma"].split("/")[1]),3)
+        season_data[k]["ftp"] = round(int(season_data[k]["ftma"].split("/")[0]) / int(season_data[k]["ftma"].split("/")[1]),3)
     
         for cat in ["gp", "tpm", "pts", "reb", "ast", "st", "blk", "to"]:
             season_data[k][cat] = round(season_data[k][cat] / len(data_list),1)
