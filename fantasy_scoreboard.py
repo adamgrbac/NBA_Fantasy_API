@@ -193,7 +193,7 @@ def calc_mvp(data: Dict, sort_order: List, stat_keys: Dict) -> Dict:
                 min_value = max([x for x in w_diffs if x <= 0])
                 min_key = w_diffs.index(min_value)
                 if -diffs[min_key] > mvp[team["name"].encode('ascii','ignore').decode('ascii')][min_key]:
-                    mvp[team["name"].encode('ascii','ignore').decode('ascii')][min_key] = -diffs[min_key] + 1
+                    mvp[team["name"].encode('ascii','ignore').decode('ascii')][min_key] = round(-diffs[min_key] + 1,1)
                 WL[min_key] = 1
                 w_diffs[min_key] = 1
     
@@ -313,6 +313,9 @@ def agg_season_data(data_list: List) -> Dict:
         season_data[k]["fgp"] = round(int(season_data[k]["fgma"].split("/")[0]) / int(season_data[k]["fgma"].split("/")[1]),3)
         season_data[k]["ftp"] = round(int(season_data[k]["fgma"].split("/")[0]) / int(season_data[k]["fgma"].split("/")[1]),3)
     
+        for cat in ["gp", "tpm", "pts", "reb", "ast", "st", "blk", "to"]:
+            season_data[k][cat] = round(season_data[k][cat] / len(data_list),1)
+    
     return season_data
     
     
@@ -394,7 +397,7 @@ for week in range(1,current_week+1):
 season_data = agg_season_data(data_list)
 
 # Create folder for week's stats if it doesn't existt
-os.makedirs(os.path.dirname("./data/fantasy/season_total/"), exist_ok=True)
+os.makedirs(os.path.dirname("./data/fantasy/season_avg/"), exist_ok=True)
 
 # What If?
 (what_if_win, what_if_cats, what_if_win_pg, what_if_cats_pg, sort_order, sort_order_pg) = calc_whatifs(season_data)
@@ -403,4 +406,4 @@ os.makedirs(os.path.dirname("./data/fantasy/season_total/"), exist_ok=True)
 mvp = calc_mvp(season_data, sort_order, stat_keys)
 
 # Output files
-output_files(f"./data/fantasy/season_total", season_data, what_if_win, what_if_cats, what_if_win_pg, what_if_cats_pg, mvp, stat_keys)
+output_files(f"./data/fantasy/season_avg", season_data, what_if_win, what_if_cats, what_if_win_pg, what_if_cats_pg, mvp, stat_keys)
