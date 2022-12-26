@@ -98,7 +98,7 @@ def layout():
                 id="week_dropdown",
                 options=[
                     {"label": week, "value": week}
-                    for week in weeks
+                    for week in sorted(weeks)
                 ],
                 value=f"week_{max_week}",
                 clearable=False,
