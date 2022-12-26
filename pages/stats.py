@@ -73,7 +73,7 @@ def layout():
 
     data_path = Path("./data/fantasy/")
     weeks = [week.name for week in data_path.iterdir()]
-    max_week = max([week.split('_')[1] for week in weeks if "week" in week])
+    max_week = max([int(week.split('_')[1]) for week in weeks if "week" in week])
 
     results = pd.read_csv(f"./data/fantasy/week_{max_week}/1_Results.csv")
     cat_winners = pd.read_csv(f"./data/fantasy/week_{max_week}/2_Cat_Winners.csv")
