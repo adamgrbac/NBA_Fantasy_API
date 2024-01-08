@@ -322,8 +322,8 @@ def agg_season_data(data_list: List) -> Dict:
 # App authentication params
 client_id = os.getenv("YAHOO_CLIENT_ID")
 client_secret = os.getenv("YAHOO_CLIENT_SECRET")
-league_id = '81070'
-season_year = 2022
+league_id = '39438'
+season_year = 2023
 stat_keys = ["fgp","ftp","tpm","pts","reb","ast","st","blk","to"]
 prefix = "default:"
 xmlns = {"default":"http://fantasysports.yahooapis.com/fantasy/v2/base.rng"}
@@ -355,7 +355,7 @@ authenticator = Authenticator(client_id=os.getenv('YAHOO_CLIENT_ID'),
 
 # Write the latest refresh token
 with open("REFRESH_TOKEN", "w", encoding="utf-8") as f:
-    f.write(REFRESH_TOKEN)
+    f.write(authenticator.refresh_token)
 
 print("Setting up Fantasy API...")
 yahoo_fantasy = FantasyAPI(league_id, season_year, authenticator)

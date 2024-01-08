@@ -5,6 +5,7 @@ import pandas as pd
 import numpy as np
 
 app = Dash(__name__, use_pages=True, external_stylesheets=[dbc.themes.BOOTSTRAP])
+server = app.server
 
 app.layout = html.Div(
     children=[

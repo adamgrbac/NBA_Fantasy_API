@@ -10,12 +10,13 @@ from typing import List
 # REFACTOR:
 #   Make this an abstract class to account for other fantasy services
 class FantasyAPI:
-    def __init__(self, league_id: int, season: int, authenticator: Authenticator):
+    def __init__(self, league_id: int, season: int, authenticator: Authenticator, week:int=None):
         self.league_id = league_id
         self.access_token = authenticator.access_token
         self.PREFIX = "default:"
         self.XMLNS = {"default": "http://fantasysports.yahooapis.com/fantasy/v2/base.rng"}
         self.season = season
+        self.week = week
         self.players = self.get_players()
 
     def get_game_key(self) -> str:
@@ -26,6 +27,9 @@ class FantasyAPI:
         return root.find(f"{self.PREFIX}games", self.XMLNS).find(f"{self.PREFIX}game", self.XMLNS).find(f"{self.PREFIX}game_key", self.XMLNS).text
         
     def get_current_week(self, game_key: str) -> int:
+        if self.week:
+            return self.week
+
         res = requests.get(f'https://fantasysports.yahooapis.com/fantasy/v2/league/{game_key}.l.{self.league_id}',
                            headers={"Authorization": f"Bearer {self.access_token}"})
         root = ET.fromstring(res.content.decode('utf8'))

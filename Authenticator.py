@@ -21,7 +21,6 @@ class Authenticator:
         self.get_access_token()
 
     def get_access_token(self) -> str:
-
         # Authenticate using Refresh Token if possible, otherwise prompt user to approve in browser
         if self.refresh_token is None:
             res = requests.get(self.auth_url,
@@ -43,7 +42,6 @@ class Authenticator:
                                   "redirect_uri": self.redirect_uri,
                                   code_type: code},
                             auth=(self.client_id, self.client_secret))
-
         # Save access & refresh tokens
         self.refresh_token = res.json()['refresh_token']
         self.access_token = res.json()['access_token']
