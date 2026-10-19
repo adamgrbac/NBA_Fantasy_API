@@ -322,8 +322,8 @@ def agg_season_data(data_list: List) -> Dict:
 # App authentication params
 client_id = os.getenv("YAHOO_CLIENT_ID")
 client_secret = os.getenv("YAHOO_CLIENT_SECRET")
-league_id = '39438'
-season_year = 2023
+league_id = '60199'
+season_year = 2025
 stat_keys = ["fgp","ftp","tpm","pts","reb","ast","st","blk","to"]
 prefix = "default:"
 xmlns = {"default":"http://fantasysports.yahooapis.com/fantasy/v2/base.rng"}
@@ -374,7 +374,7 @@ print(f"Assembling stats for week {current_week}...")
 data = scoreboard_to_dict(scoreboard, prefix, xmlns)
 
 # Create folder for week's stats if it doesn't existt
-os.makedirs(os.path.dirname("./data/fantasy/week_"+str(current_week)+"/"), exist_ok=True)
+os.makedirs(os.path.dirname(f"./data/fantasy/season_{str(season_year)}/week_{str(current_week)}/"), exist_ok=True)
 
 # What If?
 (what_if_win, what_if_cats, what_if_win_pg, what_if_cats_pg, sort_order, sort_order_pg) = calc_whatifs(data)
@@ -383,7 +383,7 @@ os.makedirs(os.path.dirname("./data/fantasy/week_"+str(current_week)+"/"), exist
 mvp = calc_mvp(data, sort_order, stat_keys)
 
 # Output files
-output_files(f"./data/fantasy/week_{current_week}", data, what_if_win, what_if_cats, what_if_win_pg, what_if_cats_pg, mvp, stat_keys)
+output_files(f"./data/fantasy/season_{str(season_year)}/week_{current_week}", data, what_if_win, what_if_cats, what_if_win_pg, what_if_cats_pg, mvp, stat_keys)
 
 # Get season running totals
 print(f"Assembling stats for season...")
@@ -397,7 +397,7 @@ for week in range(1,current_week+1):
 season_data = agg_season_data(data_list)
 
 # Create folder for week's stats if it doesn't existt
-os.makedirs(os.path.dirname("./data/fantasy/season_avg/"), exist_ok=True)
+os.makedirs(os.path.dirname(f"./data/fantasy/season_{str(season_year)}/season_avg/"), exist_ok=True)
 
 # What If?
 (what_if_win, what_if_cats, what_if_win_pg, what_if_cats_pg, sort_order, sort_order_pg) = calc_whatifs(season_data)
@@ -406,4 +406,4 @@ os.makedirs(os.path.dirname("./data/fantasy/season_avg/"), exist_ok=True)
 mvp = calc_mvp(season_data, sort_order, stat_keys)
 
 # Output files
-output_files(f"./data/fantasy/season_avg", season_data, what_if_win, what_if_cats, what_if_win_pg, what_if_cats_pg, mvp, stat_keys)
+output_files(f"./data/fantasy/season_{season_year}/season_avg", season_data, what_if_win, what_if_cats, what_if_win_pg, what_if_cats_pg, mvp, stat_keys)

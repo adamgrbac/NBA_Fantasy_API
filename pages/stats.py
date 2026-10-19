@@ -5,6 +5,7 @@ import numpy as np
 from math import floor
 from pathlib import Path
 
+season_year = 2025
 dash.register_page(__name__)
 
 def colour_scale(start, mid, end, steps=64):
@@ -71,15 +72,15 @@ def heatmap_column(df, col, rev=False, n_bins=64):
 
 def layout():
 
-    data_path = Path("./data/fantasy/")
+    data_path = Path(f"./data/fantasy/season_{season_year}/")
     weeks = [week.name for week in data_path.iterdir()]
     max_week = max([int(week.split('_')[1]) for week in weeks if "week" in week])
 
-    results = pd.read_csv(f"./data/fantasy/week_{max_week}/1_Results.csv")
-    cat_winners = pd.read_csv(f"./data/fantasy/week_{max_week}/2_Cat_Winners.csv")
-    what_if_cats = pd.read_csv(f"./data/fantasy/week_{max_week}/3_WhatIf_Cats.csv")
-    what_if_wl = pd.read_csv(f"./data/fantasy/week_{max_week}/4_WhatIf_WL.csv")
-    mvp = pd.read_csv(f"./data/fantasy/week_{max_week}/MVP.csv")
+    results = pd.read_csv(f"./data/fantasy/season_{season_year}/week_{max_week}/1_Results.csv")
+    cat_winners = pd.read_csv(f"./data/fantasy/season_{season_year}/week_{max_week}/2_Cat_Winners.csv")
+    what_if_cats = pd.read_csv(f"./data/fantasy/season_{season_year}/week_{max_week}/3_WhatIf_Cats.csv")
+    what_if_wl = pd.read_csv(f"./data/fantasy/season_{season_year}/week_{max_week}/4_WhatIf_WL.csv")
+    mvp = pd.read_csv(f"./data/fantasy/season_{season_year}/week_{max_week}/MVP.csv")
     
     col_styles = []
     for col in ["fgp", "ftp", "tpm", "pts", "reb", "ast", "st", "blk", "to", "gp"]:
@@ -244,11 +245,11 @@ def layout():
     [Input("week_dropdown", "value")]
 )
 def load_stats_week(week_num: str):
-    results = pd.read_csv(f"./data/fantasy/{week_num}/1_Results.csv")
-    cat_winners = pd.read_csv(f"./data/fantasy/{week_num}/2_Cat_Winners.csv")
-    what_if_cats = pd.read_csv(f"./data/fantasy/{week_num}/3_WhatIf_Cats.csv")
-    what_if_wl = pd.read_csv(f"./data/fantasy/{week_num}/4_WhatIf_WL.csv")
-    mvp = pd.read_csv(f"./data/fantasy/{week_num}/MVP.csv")
+    results = pd.read_csv(f"./data/fantasy/season_{season_year}/{week_num}/1_Results.csv")
+    cat_winners = pd.read_csv(f"./data/fantasy/season_{season_year}/{week_num}/2_Cat_Winners.csv")
+    what_if_cats = pd.read_csv(f"./data/fantasy/season_{season_year}/{week_num}/3_WhatIf_Cats.csv")
+    what_if_wl = pd.read_csv(f"./data/fantasy/season_{season_year}/{week_num}/4_WhatIf_WL.csv")
+    mvp = pd.read_csv(f"./data/fantasy/season_{season_year}/{week_num}/MVP.csv")
     
     WIWL_style_cond = (
         [{
