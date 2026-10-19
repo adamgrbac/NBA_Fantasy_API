@@ -322,8 +322,8 @@ def agg_season_data(data_list: List) -> Dict:
 # App authentication params
 client_id = os.getenv("YAHOO_CLIENT_ID")
 client_secret = os.getenv("YAHOO_CLIENT_SECRET")
-league_id = '60199'
-season_year = 2025
+league_id = '76614'
+season_year = 2026
 stat_keys = ["fgp","ftp","tpm","pts","reb","ast","st","blk","to"]
 prefix = "default:"
 xmlns = {"default":"http://fantasysports.yahooapis.com/fantasy/v2/base.rng"}
